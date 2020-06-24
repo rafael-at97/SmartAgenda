@@ -5,7 +5,7 @@ exports.up = function(knex) {
         table.string('description');
         table.date('startDate').notNullable();
         table.time('startTime').notNullable();
-        table.date('endData').notNullable();
+        table.date('endDate').notNullable();
         table.time('endTime').notNullable();
         table.string('repetitionType');
         table.date('repetitionEnd');
