@@ -41,7 +41,12 @@ module.exports = {
         }
     }, 
     async index(request, response) {
-        const tasks = await connection('tasks').select("*");
+        const {id} = request.params;
+        if(id) {
+            var tasks = await connection('tasks').where('parentID', id).select('*');
+        } else {
+            var tasks = await connection('tasks').select('*');
+        }
 
         return response.json({tasks});
     }
