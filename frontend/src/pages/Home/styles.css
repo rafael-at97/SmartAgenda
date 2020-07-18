@@ -1,0 +1,81 @@
+.home-container {
+    width: 100%;
+}
+
+.home-container header {
+    font-weight: bold;
+    font-size: 22px;
+    padding: 8px;
+    width: 100%;
+    background-color: #FFF;
+    border-bottom: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.home-container ul {
+    margin: auto;
+    width: 80%;
+    list-style: none;
+}
+
+.home-container ul li {
+    margin: 10px;
+    background-color: #FFF;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.home-container ul li button {
+    height: 100%;
+    width: 100%;
+    padding: 10px;
+    text-align: left
+}
+
+.icon {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+}
+
+.app-info {
+    flex: 0 0 auto;
+    padding: 5px;
+    padding-right: 25px;
+    border-right: 2px solid lightgray;
+}
+
+.list-info {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+.list-info .icon {
+    flex: 0 0 auto;
+}
+
+.list-info .path {
+    flex: 1 0 auto;
+}
+
+.list-info .subpath {
+    margin-left: 2px;
+    padding: 5px;
+}
+
+.settings {
+    flex: 0 0 auto;
+    padding-left: 10px;
+    display: flex;
+    border-left: 2px solid lightgray;
+}
+
+.title {
+    font-size: 24;
+    font-weight: bold; 
+}
