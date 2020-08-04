@@ -1,20 +1,15 @@
 exports.up = function(knex) {
     return knex.schema.createTable('tasks', function (table) {
-        table.increments('taskID');
-        table.string('title').notNullable();
+        table.increments('taskID').primary();
+        table.string('title', 64).notNullable();
         table.string('description');
-        table.date('startDate').notNullable();
-        table.time('startTime').notNullable();
-        table.date('endDate');
-        table.time('endTime');
-        table.string('repetitionType');
-        table.date('repetitionEnd');
         table.boolean('done').notNullable();
         table.integer('parentID').notNullable();
         table.foreign('parentID').references('listID').inTable('lists');
+        table.unique(['parentID', 'title']);
     });
 };
 
 exports.down = function(knex) {
-    knex.schema.dropTable('tasks');
+    return knex.schema.dropTable('tasks');
 };
