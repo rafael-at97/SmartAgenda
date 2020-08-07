@@ -67,9 +67,9 @@ module.exports = {
         }
 
         //Apagar e verificar se foi apagado algo de fato
-        var res = await connection('lists').whereIn('listID', children).whereNot('listId', 1).delete(); 
+        var res = await connection('lists').whereIn('listID', children).whereNot('listId', 1).del(); 
         //Nota: Nao inverter a ordem, senao corre risco de nao executar a query 
-        res = (await connection('tasks').whereIn('parentID', children).delete() || res); 
+        res = (await connection('tasks').whereIn('parentID', children).del() || res); 
 
         if(!res) {
             return response.status(405).send();

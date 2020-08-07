@@ -82,7 +82,7 @@ module.exports = {
     async delete(request, response) {
         const {id} = request.params;
 
-        const ans = await connection('tasks').where('taskID', id).delete();
+        const ans = await connection('tasks').where('taskID', id).del();
         if(ans) {
             return response.status(204).send();
         } else {
