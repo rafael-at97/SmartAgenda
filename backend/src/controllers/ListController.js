@@ -10,11 +10,14 @@ module.exports = {
             return response.status(400).send({"error":"Title required/not valid"});
         } 
         title = title.split(" ").filter(function(value){ return value !== "";}).join(" "); //Retirando espacos extras
-
+        if (title.length > 32) {
+            return response.status(400).send({"error":"Title too big"});
+        }
+        
         //Verificacao da cor
         if(ValidateData.empty(color)) {
-            color = '0xffffff';
-        } else if(isNaN(color)) { //por enquanto, a unica validacao eh essa
+            color = 'ffffff';
+        } else if(isNaN("0x".concat(color)) || color.length != 6) { //por enquanto, a unica validacao eh essa
             return response.status(400).send({"error":"color not valid"});
         }
         
@@ -30,11 +33,12 @@ module.exports = {
                 return response.status(400).send({"error": "parentID not valid"});
             }
         }
-        
         //Insercao no banco de dados
-        const [list_id] = await connection('lists').insert({
-            title, color, parentID
-        });
+        try {
+            const [list_id] = await connection('lists').insert({ title, color, parentID });
+        } catch (err) {
+            return response.status(400).send(err);
+        }   
         
         return response.json({list_id});
     },
