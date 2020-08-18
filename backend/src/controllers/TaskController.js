@@ -1,6 +1,6 @@
 const connection = require('../database/connection');
 const ValidateData = require('../validate/ValidateData');
-const { addListener } = require('../database/connection');
+const repDefs = require('../validate/repetitionDefs');
 
 module.exports = {
     async create(request, response) {
@@ -49,44 +49,38 @@ module.exports = {
 
         // After task is created, validate and insert schedules
 
+        // Validate batch
         for (var i = 0; i<schedules.length; )
         {
             // Date Validation
             if(ValidateData.empty(schedules[i]['date'])) {
-                task['startDate'] = new Date().toISOString().slice(0,10); // ISO String without time information
-            } else if(ValidateData.date(task['startDate'])){
+                schedules[i]['date'] = new Date().toISOString().slice(0,10); // ISO String without time information
+            } else if(!ValidateData.isDate(schedule[i]['date'])){
                 return response.status(400).send({"error":"startDate not valid"});
             }
             
-        }
+            // startTime Validation
+            if(ValidateData.empty(schedules[i]['startTime'])) {
+                schedules[i]['startTime'] = new Date().toISOString().slice(11,23);  // ISO String without date information
+            } else if(!ValidateData.isTime(schedules[i]['startTime'])) {
+                return response.status(400).send({"error": "startTime not valid"});
+            }
+            
+            // duration Validation
+            if(ValidateData.empty(schedules[i]['duration'])) {
+                schedules[i]['duration'] = null;
+            } else if(!ValidateData.isTime(schedules[i]['duration'])) {
+                return response.status(400).send({"error": "duration not valid"});
+            } 
 
+            // repetitionType patternization -- Ainda nao ha validacao porque n sabemos como sera o padrao, Rosana rimando
+            if(ValidateData.empty(schedules[i]['repetitionType'])) {
+                schedules[i]['repetitionType'] = 0;
+            } else if(schedules[i]['repetitionType'] & repDefs.EVERY_X_DAY)
+
+        }
         /*
 
-        //endDate Validation
-        if(ValidateData.empty(endDate)) {
-            endDate = null;
-        } else if(ValidateData.date(endDate)){
-            return response.status(400).send({"error":"endDate not valid"});
-        }
-
-        //startTime Validation
-        if(ValidateData.empty(startTime)) {
-            startTime = new Date().toISOString().slice(11,23);
-        } else if(ValidateData.time(startTime)) {
-            return response.status(400).send({"error": "startTime not valid"});
-        }
-
-        //endTime Validation
-        if(ValidateData.empty(endTime)) {
-            endTime = null;
-        } else if(ValidateData.time(endTime)) {
-            return response.status(400).send({"error": "endTime not valid"});
-        } 
-    
-        //repetitionType patternization --Ainda nao ha validacao porque n sabemos como sera o padrao
-        if(ValidateData.empty(repetitionType)) {
-            repetitionType = 0;
-        }
 
          //repetitionEnd patternization --Ainda nao ha validacao porque n sabemos como sera o padrao
         if(ValidateData.empty(repetitionEnd)) {
