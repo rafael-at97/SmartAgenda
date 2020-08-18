@@ -1,23 +1,66 @@
 const connection = require('../database/connection');
 const ValidateData = require('../validate/ValidateData');
+const { addListener } = require('../database/connection');
 
 module.exports = {
     async create(request, response) {
-        var {title, description, startDate, startTime, endDate, endTime, 
-        repetitionType, repetitionEnd, parentID} = request.body;
+        var {title, description, parentID, schedules} = request.body;
+
+        // First validate task
 
         //title Validation
         if(ValidateData.empty(title)) {
             return response.status(400).send({"error":"Title required/not valid"});
         } 
         var title = title.split(" ").filter(function(value){ return value !== "";}).join(" "); //Retirando espaços extras
-
-        //startDate Validation
-        if(ValidateData.empty(startDate)) {
-            startDate = new Date().toISOString().slice(0,10);
-        } else if(ValidateData.date(startDate)){
-            return response.status(400).send({"error":"startDate not valid"});
+        if (title.length > 64) {
+            return response.status(400).send({"error":"Title too big"});
         }
+
+        // description Validation
+        if(ValidateData.empty(description)) {
+            description = null;                 // Default value
+        }
+        else if (description.length > 255) {
+            return response.status(400).send({"error":"Description too big"});
+        }
+
+        // parentID Validation
+        if(ValidateData.empty(parentID)) {
+            parentID = 1;
+        } else if (isNaN(parentID)){
+            return response.status(400).send({"error":"parentID not valid"});
+        } else {
+            var [count] = await connection('lists').where('listID', parentID).count();
+            count = count['count(*)'];
+            if (!count) {
+                return response.status(400).send({"error":"parentID not valid"});
+            }
+        }
+        
+        var done = 0;
+
+        try {
+            const [task_id] = await connection('tasks').insert({title, description, done, parentID});
+        }
+        catch(err) {
+            return response.status(400).send(err);
+        }
+
+        // After task is created, validate and insert schedules
+
+        for (var i = 0; i<schedules.length; )
+        {
+            // Date Validation
+            if(ValidateData.empty(schedules[i]['date'])) {
+                task['startDate'] = new Date().toISOString().slice(0,10); // ISO String without time information
+            } else if(ValidateData.date(task['startDate'])){
+                return response.status(400).send({"error":"startDate not valid"});
+            }
+            
+        }
+
+        /*
 
         //endDate Validation
         if(ValidateData.empty(endDate)) {
@@ -39,44 +82,20 @@ module.exports = {
         } else if(ValidateData.time(endTime)) {
             return response.status(400).send({"error": "endTime not valid"});
         } 
-
-        //parentID Validation
-        if(ValidateData.empty(parentID)) {
-            parentID = 1;
-        } else if (isNaN(parentID)){
-            return response.status(400).send({error: 'parentID not valid'});
-        } else {
-            var [count] = await connection('lists').where('listID', parentID).count();
-            count = count['count(*)'];
-            if (!count) {
-                return response.status(400).send({"error": 'parentID not valid'});
-            }
-        }
-
-        //description padronization
-        if(ValidateData.empty(description)) {
-            description = null;
-        }
-
-        //repetitionType padronization --Ainda nao ha validacao porque n sabemos como sera o padrao
+    
+        //repetitionType patternization --Ainda nao ha validacao porque n sabemos como sera o padrao
         if(ValidateData.empty(repetitionType)) {
             repetitionType = 0;
         }
 
-         //repetitionEnd padronization --Ainda nao ha validacao porque n sabemos como sera o padrao
+         //repetitionEnd patternization --Ainda nao ha validacao porque n sabemos como sera o padrao
         if(ValidateData.empty(repetitionEnd)) {
             repetitionEnd = 0;
         }
-        
-        var done = 0;
 
-        const [task_id] = await connection('tasks').insert({
-            title, description, startDate, startTime, endDate, endTime, 
-            repetitionType, repetitionEnd, done, parentID 
-        });
+        */
 
-        return response.json({task_id, title, description, startDate, startTime, endDate, endTime, 
-            repetitionType, repetitionEnd, done, parentID});
+        return response.json({task_id, title, description, done, parentID});
     },
 
     async delete(request, response) {
