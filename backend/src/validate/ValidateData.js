@@ -46,5 +46,15 @@ module.exports = {
         }
     
         return true;
-    }
+    }, 
+    isRepetitionType (data) {
+        if (!isEmpty(data)) {
+            data = data.toLowerCase();
+            if(data === 'day' || data === 'week' || data === 'month' || data === 'year') {
+              return true;  
+            }   
+        }
+        return false;
+    },
+    
 }

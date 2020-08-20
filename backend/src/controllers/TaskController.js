@@ -71,12 +71,16 @@ module.exports = {
                 schedules[i]['duration'] = null;
             } else if(!ValidateData.isTime(schedules[i]['duration'])) {
                 return response.status(400).send({"error": "duration not valid"});
-            } 
+            }
+            
+            let repetition = schedules[i]['repetition'];
 
-            // repetitionType patternization -- Ainda nao ha validacao porque n sabemos como sera o padrao, Rosana rimando
-            if(ValidateData.empty(schedules[i]['repetitionType'])) {
-                schedules[i]['repetitionType'] = 0;
-            } else if(schedules[i]['repetitionType'] & repDefs.EVERY_X_DAY)
+            if(!ValidateData.empty(repetition)) {
+                if(ValidateData.isRepetitionType(repetition)){
+                    return response.status(400).send({"error": "repetition type not valid"});
+                }
+                
+            }
 
         }
         /*
