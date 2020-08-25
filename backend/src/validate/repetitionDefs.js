@@ -1,6 +1,10 @@
-var EVERY_X_DAY = 1 << 16;
+var WDAYS_MASK = 0x7F;
+var MWEEKS_MASK = 0x7;
+var VALUE_MASK = 0xFFFF;
 
 module.exports = 
 {
-    EVERY_X_DAY
+    WDAYS_MASK,
+    MWEEKS_MASK,
+    VALUE_MASK
 }

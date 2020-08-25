@@ -1,5 +1,17 @@
+const WDAYS_MASK, MWEEKS_MASK, VALUE_MASK = require('./repetitionDefs');
+
 function isEmpty(data) { 
     return(!data || /^\s*$/.test(data));
+}
+
+function isRepetitionType (data) {
+    if (!isEmpty(data)) {
+        data = data.toLowerCase();
+        if(data === 'day' || data === 'week' || data === 'month' || data === 'year') {
+            return true;  
+        }   
+    }
+    return false;
 }
 
 module.exports = {
@@ -47,14 +59,27 @@ module.exports = {
     
         return true;
     }, 
-    isRepetitionType (data) {
-        if (!isEmpty(data)) {
-            data = data.toLowerCase();
-            if(data === 'day' || data === 'week' || data === 'month' || data === 'year') {
-              return true;  
-            }   
+    isValidRepetition (data) {
+        if(!isRepetitionType(data['type'])) {
+            return false
         }
-        return false;
-    },
-    
+        else {
+            if(data['type'].toLowerCase() == 'week') {
+                if( (data['wdays'] & WDAYS_MASK) == 0 ) {
+                    return false;
+                }
+            }
+            else if(data['type'].toLowerCase() == 'month') {
+                if( ((data['mweeks'] & MWEEKS_MASK) != 0) && ((data['wdays'] & WDAYS_MASK) == 0) ) {
+                    return false;
+                }
+            }
+        }
+
+        if( (data['wdays'] & ~WDAYS_MASK) || (data['mweeks'] & ~MWEEKS_MASK) || (data['value'] & ~VALUE_MASK) ) {
+            return false;
+        }
+
+        return true;
+    }
 }
