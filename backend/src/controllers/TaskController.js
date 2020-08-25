@@ -1,6 +1,5 @@
 const connection = require('../database/connection');
 const ValidateData = require('../validate/ValidateData');
-const repDefs = require('../validate/repetitionDefs');
 
 module.exports = {
     async create(request, response) {
@@ -73,13 +72,42 @@ module.exports = {
                 return response.status(400).send({"error": "duration not valid"});
             }
             
+            // Repetition type received as an object from front-end
             let repetition = schedules[i]['repetition'];
 
+            // repetition will be an object with properties 'type', 'wdays', 'mweeks', 'value'
+
             if(!ValidateData.empty(repetition)) {
-                if(ValidateData.isRepetitionType(repetition)){
+                if(repetition['wdays'] == null) repetition['wdays'] = 0;
+                if(repetition['mweeks'] == null) repetition['mweeks'] = 0;
+                if(repetition['value'] == null) repetition['value'] = 0;
+
+                if(!ValidateData.isValidRepetition(repetition)){
                     return response.status(400).send({"error": "repetition type not valid"});
                 }
+
+                // All valid, transform object into int for database
+                let dbRep = 0;
                 
+                if(repetition['type'].toLowerCase() == 'day') {
+                    dbRep = 1 << 8;
+                }
+                else if(repetition['type'].toLowerCase() == 'week') {
+                    dbRep = 2 << 8;
+                }
+                else if(repetition['type'].toLowerCase() == 'month') {
+                    dbRep = 4 << 8;
+                }
+                else if(repetition['type'].toLowerCase() == 'year') {
+                    dbRep = 8 << 8;
+                }
+
+                dbRep = (dbRep | repetition['wdays']) << 4;
+                dbRep = (dbRep | repetition['mweeks']) << 16;
+                dbRep = dbRep | repetition['value'];
+            }
+            else {
+                schedules[i]['repetition'] = null;
             }
 
         }
