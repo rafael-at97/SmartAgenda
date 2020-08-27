@@ -1,4 +1,4 @@
-const WDAYS_MASK, MWEEKS_MASK = require('./repetitionDefs');
+const WDAYS_MASK, MWEEKS_MASK, VALUE_MASK = require('./repetitionDefs');
 
 function isEmpty(data) { 
     return(!data || /^\s*$/.test(data));
@@ -74,6 +74,10 @@ module.exports = {
                     return false;
                 }
             }
+        }
+
+        if( (data['wdays'] & ~WDAYS_MASK) || (data['mweeks'] & ~MWEEKS_MASK) || (data['value'] & ~VALUE_MASK) ) {
+            return false;
         }
 
         return true;

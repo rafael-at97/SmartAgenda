@@ -111,15 +111,6 @@ module.exports = {
             }
 
         }
-        /*
-
-
-         //repetitionEnd patternization --Ainda nao ha validacao porque n sabemos como sera o padrao
-        if(ValidateData.empty(repetitionEnd)) {
-            repetitionEnd = 0;
-        }
-
-        */
 
         return response.json({task_id, title, description, done, parentID});
     },
