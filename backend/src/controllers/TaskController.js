@@ -38,81 +38,85 @@ module.exports = {
         }
         
         var done = 0;
-
+        /*
         try {
             const [task_id] = await connection('tasks').insert({title, description, done, parentID});
         }
         catch(err) {
             return response.status(400).send(err);
-        }
+        }*/
 
         // After task is created, validate and insert schedules
 
         // Validate batch
-        for (var i = 0; i<schedules.length; )
-        {
-            // Date Validation
-            if(ValidateData.empty(schedules[i]['date'])) {
-                schedules[i]['date'] = new Date().toISOString().slice(0,10); // ISO String without time information
-            } else if(!ValidateData.isDate(schedule[i]['date'])){
-                return response.status(400).send({"error":"startDate not valid"});
-            }
-            
-            // startTime Validation
-            if(ValidateData.empty(schedules[i]['startTime'])) {
-                schedules[i]['startTime'] = new Date().toISOString().slice(11,23);  // ISO String without date information
-            } else if(!ValidateData.isTime(schedules[i]['startTime'])) {
-                return response.status(400).send({"error": "startTime not valid"});
-            }
-            
-            // duration Validation
-            if(ValidateData.empty(schedules[i]['duration'])) {
-                schedules[i]['duration'] = null;
-            } else if(!ValidateData.isTime(schedules[i]['duration'])) {
-                return response.status(400).send({"error": "duration not valid"});
-            }
-            
-            // Repetition type received as an object from front-end
-            let repetition = schedules[i]['repetition'];
 
-            // repetition will be an object with properties 'type', 'wdays', 'mweeks', 'value'
-
-            if(!ValidateData.empty(repetition)) {
-                if(repetition['wdays'] == null) repetition['wdays'] = 0;
-                if(repetition['mweeks'] == null) repetition['mweeks'] = 0;
-                if(repetition['value'] == null) repetition['value'] = 0;
-
-                if(!ValidateData.isValidRepetition(repetition)){
-                    return response.status(400).send({"error": "repetition type not valid"});
+        if (schedules != null ){
+            for (var i = 0; i<schedules.length; i++)
+            {
+                // Date Validation
+                if(ValidateData.empty(schedules[i]['date'])) {
+                    schedules[i]['date'] = new Date().toISOString().slice(0,10); // ISO String without time information
+                } else if(!ValidateData.isDate(schedules[i]['date'])){
+                    return response.status(400).send({"error":"startDate not valid"});
                 }
-
-                // All valid, transform object into int for database
-                let dbRep = 0;
                 
-                if(repetition['type'].toLowerCase() == 'day') {
-                    dbRep = 1 << 8;
+                // startTime Validation
+                if(ValidateData.empty(schedules[i]['startTime'])) {
+                    schedules[i]['startTime'] = new Date().toISOString().slice(11,23);  // ISO String without date information
+                } else if(!ValidateData.isTime(schedules[i]['startTime'])) {
+                    return response.status(400).send({"error": "startTime not valid"});
                 }
-                else if(repetition['type'].toLowerCase() == 'week') {
-                    dbRep = 2 << 8;
+                
+                // duration Validation
+                if(ValidateData.empty(schedules[i]['duration'])) {
+                    schedules[i]['duration'] = null;
+                } else if(!ValidateData.isTime(schedules[i]['duration'])) {
+                    return response.status(400).send({"error": "duration not valid"});
                 }
-                else if(repetition['type'].toLowerCase() == 'month') {
-                    dbRep = 4 << 8;
-                }
-                else if(repetition['type'].toLowerCase() == 'year') {
-                    dbRep = 8 << 8;
-                }
+                
+                // Repetition type received as an object from front-end
+                let repetition = schedules[i]['repetition'];
 
-                dbRep = (dbRep | repetition['wdays']) << 4;
-                dbRep = (dbRep | repetition['mweeks']) << 16;
-                dbRep = dbRep | repetition['value'];
-            }
-            else {
-                schedules[i]['repetition'] = null;
-            }
+                // repetition will be an object with properties 'type', 'wdays', 'mweeks', 'value'
 
+                if(!ValidateData.empty(repetition)) {
+                    if(repetition['wdays'] == null) repetition['wdays'] = 0;
+                    if(repetition['mweeks'] == null) repetition['mweeks'] = 0;
+                    if(repetition['value'] == null) repetition['value'] = 0;
+
+                    if(!ValidateData.isValidRepetition(repetition)){
+                        return response.status(400).send({"error": "repetition type not valid"});
+                    }
+
+                    // All valid, transform object into int for database
+                    let dbRep = 0;
+                    
+                    if(repetition['type'].toLowerCase() == 'day') {
+                        dbRep = 1 << 8;
+                    }
+                    else if(repetition['type'].toLowerCase() == 'week') {
+                        dbRep = 2 << 8;
+                    }
+                    else if(repetition['type'].toLowerCase() == 'month') {
+                        dbRep = 4 << 8;
+                    }
+                    else if(repetition['type'].toLowerCase() == 'year') {
+                        dbRep = 8 << 8;
+                    }
+
+                    dbRep = (dbRep | repetition['wdays']) << 4;
+                    dbRep = (dbRep | repetition['mweeks']) << 16;
+                    dbRep = dbRep | repetition['value'];
+
+                    repetition['dbRep'] = dbRep.toString(16);
+                }
+                else {
+                    schedules[i]['repetition'] = null;
+                }
+            }
         }
 
-        return response.json({task_id, title, description, done, parentID});
+        return response.json({ title, description, done, parentID, schedules});
     },
 
     async delete(request, response) {

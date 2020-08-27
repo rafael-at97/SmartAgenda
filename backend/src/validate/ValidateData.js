@@ -1,4 +1,4 @@
-const WDAYS_MASK, MWEEKS_MASK, VALUE_MASK = require('./repetitionDefs');
+const {WDAYS_MASK, MWEEKS_MASK, VALUE_MASK} = require('./repetitionDefs');
 
 function isEmpty(data) { 
     return(!data || /^\s*$/.test(data));
