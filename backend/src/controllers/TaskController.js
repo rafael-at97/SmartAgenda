@@ -70,7 +70,7 @@ module.exports = {
                 // duration Validation
                 if(ValidateData.empty(schedules[i]['duration'])) {
                     schedules[i]['duration'] = null;
-                } else if(!ValidateData.isTime(schedules[i]['duration'])) {
+                } else if(/* schedules[i]['duration'].length != 5 ||*/ !ValidateData.isTime(schedules[i]['duration'])) {
                     return response.status(400).send({"error": "duration not valid"});
                 }
                 
@@ -80,7 +80,11 @@ module.exports = {
                 // repetition will be an object with properties 'type', 'wdays', 'mweeks', 'value'
 
                 if(!ValidateData.empty(repetition)) {
-                    if(repetition['wdays'] == null) repetition['wdays'] = 0;
+                    if(repetition['wdays'] == null) {
+                        repetition['wdays'] = 0; 
+                    } else {
+                        repetition['wdays'] = "0b".concat(repetition['wdays']);
+                    }
                     if(repetition['mweeks'] == null) repetition['mweeks'] = 0;
                     if(repetition['value'] == null) repetition['value'] = 0;
 
@@ -108,13 +112,23 @@ module.exports = {
                     dbRep = (dbRep | repetition['mweeks']) << 16;
                     dbRep = dbRep | repetition['value'];
 
-                    repetition['dbRep'] = dbRep.toString(16);
+                    schedules[i]['repetition'] = dbRep.toString(16);
                 }
                 else {
                     schedules[i]['repetition'] = null;
                 }
+
+                schedules[i]['task_id'] = 1; //change to task_id
             }
         }
+        //insert into database and return response/*
+        /*try{
+            for (var i = 0; i < schedules.length ; i++) {
+                await connection('schedules').insert(schedules[i]);
+            }
+        } catch(err) {
+            return response.status(400).send(err);
+        }*/
 
         return response.json({ title, description, done, parentID, schedules});
     },

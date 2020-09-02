@@ -1,7 +1,15 @@
 const {WDAYS_MASK, MWEEKS_MASK, VALUE_MASK} = require('./repetitionDefs');
 
 function isEmpty(data) { 
-    return(!data || /^\s*$/.test(data));
+    return(!data || /^\s*$/.test(data)); //regex to check if str is null or only ' '
+}
+
+function isTimeFormat(data) {
+    return(/^\d\d:\d\d$/.test(data)); //regex to check format hh:mm 
+}
+
+function isDateFormat(data) {
+    return(/^\d\d\d\d-\d\d-\d\d$/.test(data)); //regex to check format yyyy-mm-dd
 }
 
 function isRepetitionType (data) {
@@ -19,17 +27,11 @@ module.exports = {
        return (isEmpty(data)); //isEmpty?
     }, 
     isDate(data) { //return true for valid data
-        var [year, month, day] = data.split("-");
-        if (isEmpty(year) || isEmpty(month) || isEmpty(day)){
-            return false;
-        }
-        if(isNaN(year) || isNaN(month) || isNaN(day)) {
-            return false;
-        }
-        if(year.length != 4 || month.length != 2 || day.length!= 2) {
+        if(!isDateFormat(data)) {
             return false;
         }
 
+        var [year, month, day] = data.split("-");
         var date1 = new Date(year, month-1, day, 0, 0, 0, 0);
 
         if (date1.getDate() != day || date1.getMonth() != month-1 || date1.getFullYear() != year) {
@@ -39,24 +41,15 @@ module.exports = {
         return true;
     }, 
     isTime (data) { //return true for valid data
-        var [hour, min, sec, milli] = data.split(":");
-        [sec, milli] = sec.split(".");
-        if (isEmpty(hour) || isEmpty(min) || isEmpty(sec) || isEmpty(milli)){
+        if (!isTimeFormat(data)) { 
             return false;
-        }
-        if(isNaN(hour) || isNaN(min) || isNaN(sec) || isNaN(milli)) {
-            return false;
-        }
-        if(hour.length != 2 || min.length != 2 || sec.length!= 2 || milli.length != 3) {
-            return false;
-        }
+        } 
+        var [hour, min] = data.split(":");
+        var date1 = new Date(2020, 0 , 22, hour, min, 0, 0);
 
-        var date1 = new Date(2020, 0 , 22, hour, min, sec, milli);
-
-        if (date1.getHours() != hour || date1.getMinutes() != min || date1.getSeconds() != sec || date1.getMilliseconds() != milli) {
+        if (date1.getHours() != hour || date1.getMinutes() != min ) {
             return false;
         }
-    
         return true;
     }, 
     isValidRepetition (data) {
@@ -76,6 +69,10 @@ module.exports = {
             }
         }
 
+        if (isNaN(data['wdays']) || isNaN(data['value'] || isNaN(data['mweeks']))) {
+            return false;
+        }
+        
         if( (data['wdays'] & ~WDAYS_MASK) || (data['mweeks'] & ~MWEEKS_MASK) || (data['value'] & ~VALUE_MASK) ) {
             return false;
         }
