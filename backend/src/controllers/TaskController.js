@@ -38,13 +38,15 @@ module.exports = {
         }
         
         var done = 0;
-        /*
+        
+        var task_id = 1;
+
         try {
-            const [task_id] = await connection('tasks').insert({title, description, done, parentID});
+            [task_id] = await connection('tasks').insert({title, description, done, parentID});
         }
         catch(err) {
             return response.status(400).send(err);
-        }*/
+        }
 
         // After task is created, validate and insert schedules
 
@@ -53,16 +55,16 @@ module.exports = {
         if (schedules != null ){
             for (var i = 0; i<schedules.length; i++)
             {
-                // Date Validation
+                // date Validation
                 if(ValidateData.empty(schedules[i]['date'])) {
                     schedules[i]['date'] = new Date().toISOString().slice(0,10); // ISO String without time information
                 } else if(!ValidateData.isDate(schedules[i]['date'])){
-                    return response.status(400).send({"error":"startDate not valid"});
+                    return response.status(400).send({"error":"date not valid"});
                 }
                 
                 // startTime Validation
                 if(ValidateData.empty(schedules[i]['startTime'])) {
-                    schedules[i]['startTime'] = new Date().toISOString().slice(11,23);  // ISO String without date information
+                    schedules[i]['startTime'] = new Date().toISOString().slice(11,19);  // ISO String without date information
                 } else if(!ValidateData.isTime(schedules[i]['startTime'])) {
                     return response.status(400).send({"error": "startTime not valid"});
                 }
@@ -70,7 +72,7 @@ module.exports = {
                 // duration Validation
                 if(ValidateData.empty(schedules[i]['duration'])) {
                     schedules[i]['duration'] = null;
-                } else if(/* schedules[i]['duration'].length != 5 ||*/ !ValidateData.isTime(schedules[i]['duration'])) {
+                } else if(!ValidateData.isTime(schedules[i]['duration'])) {
                     return response.status(400).send({"error": "duration not valid"});
                 }
                 
@@ -79,17 +81,23 @@ module.exports = {
 
                 // repetition will be an object with properties 'type', 'wdays', 'mweeks', 'value'
 
-                if(!ValidateData.empty(repetition)) {
-                    if(repetition['wdays'] == null) {
-                        repetition['wdays'] = 0; 
-                    } else {
-                        repetition['wdays'] = "0b".concat(repetition['wdays']);
-                    }
-                    if(repetition['mweeks'] == null) repetition['mweeks'] = 0;
-                    if(repetition['value'] == null) repetition['value'] = 0;
+                if(ValidateData.empty(repetition)) schedules[i]['repetition'] = null;
+                else {
+                    if(ValidateData.empty(repetition['wdays'])) repetition['wdays'] = 0; 
+                    if(ValidateData.empty(repetition['mweeks'])) repetition['mweeks'] = 0;
+                    if(ValidateData.empty(repetition['value'])) repetition['value'] = 0;
+                    
+                    repetition['wdays'] = "0b".concat(repetition['wdays']);
 
                     if(!ValidateData.isValidRepetition(repetition)){
                         return response.status(400).send({"error": "repetition type not valid"});
+                    }
+
+                    if( ValidateData.empty(repetition['repetitionEnd']) ) repetition['repetitionEnd'] = null;
+                    else {
+                        if(!ValidateData.isDate(repetition['repetitionEnd'])) {
+                            return response.status(400).send({"error": "repetitionEnd type not valid"});
+                        }
                     }
 
                     // All valid, transform object into int for database
@@ -112,23 +120,23 @@ module.exports = {
                     dbRep = (dbRep | repetition['mweeks']) << 16;
                     dbRep = dbRep | repetition['value'];
 
-                    schedules[i]['repetition'] = dbRep.toString(16);
-                }
-                else {
-                    schedules[i]['repetition'] = null;
+                    // Modify to database format
+                    schedules[i]['repetitionEnd'] = repetition['repetitionEnd'];
+                    schedules[i]['repetition'] = dbRep;
                 }
 
-                schedules[i]['task_id'] = 1; //change to task_id
+                schedules[i]['parentID'] = task_id;
             }
         }
-        //insert into database and return response/*
-        /*try{
+
+        // Insert into database and return response
+        try{
             for (var i = 0; i < schedules.length ; i++) {
                 await connection('schedules').insert(schedules[i]);
             }
         } catch(err) {
             return response.status(400).send(err);
-        }*/
+        }
 
         return response.json({ title, description, done, parentID, schedules});
     },
