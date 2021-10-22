@@ -1,0 +1,44 @@
+.list {
+    border-radius: 0 0 0.6rem 0.6rem;
+
+    margin-right: auto;
+    margin-left: auto;
+
+    max-width: 500px;
+    min-width: 300px;
+
+    padding: 2px;
+
+    background: linear-gradient(#838181 0%, #C9C9C9 40%, #BFA75D 100%);
+
+    flex-grow: 1;
+}
+
+.list-inner {
+    border-radius: 0 0 0.5rem 0.5rem;
+
+    height: 100%;
+    width: 100%;
+
+    background: #333;
+}
+
+.list-navigator {
+    border-bottom: 2px solid #838181;
+    padding: 0rem 0.2rem;
+}
+
+.list-navigator a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.list-navigator a:visited {
+    text-decoration: none;
+    color: #C9C9C9;
+}
+
+.list-navigator a:hover {
+    text-decoration: underline;
+}

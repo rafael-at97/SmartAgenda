@@ -1,0 +1,14 @@
+.home-container {
+    width: 100%;
+}
+
+main {
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: row;
+}
+
+@media (min-width: 1000px)
+{
+    
+}
