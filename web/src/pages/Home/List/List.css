@@ -42,3 +42,23 @@
 .list-navigator a:hover {
     text-decoration: underline;
 }
+
+/* CSS transition */
+.list-item-exit {
+    overflow: hidden;
+    max-height: 700px;
+    opacity: 1;
+    transition: all 200ms ease-out;
+    -o-transition: all 200ms ease-out;
+    -moz-transition: all 200ms ease-out;
+    -webkit-transition: all 200ms ease-out;
+}
+
+.list-item-exit.list-item-exit-active {
+    opacity: 0.25;
+    max-height: 0;
+}
+
+.list-item-exit-done {
+    height: 0px;
+}

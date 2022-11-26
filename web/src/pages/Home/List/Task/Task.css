@@ -39,7 +39,7 @@
     background: lightgray;
 }
 
-input:focus {
+textarea:focus {
     outline: none;
 }
 
@@ -57,15 +57,16 @@ input:focus {
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    margin-top: 0.2rem;
 }
 
-.task-hide {
-    color: #C9C9C9;
-    font-style: italic;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0.1rem;
+.task-body-line {
+    border-width: 0.2rem 0 0 0;
+    border-style: solid;
+    border-image: 
+        linear-gradient(
+            to right, #505050 0%, #C9C9C9 50%, #505050 100%
+        ) 1;
 }
 
 button {
@@ -83,12 +84,14 @@ button:hover {
 
     font-size: 1.2rem;
     padding: 0.4rem;
+    margin-top: 0.05rem;
     color: #C9C9C9;
 }
 
 .task-description-label {
     color: white;
     font-size: 1rem;
+    margin-top: 0.2rem;
 }
 
 .sub-tasks {
@@ -97,4 +100,48 @@ button:hover {
     height: auto;
     margin-top: 0.5rem;
     padding: 0.2rem;
+}
+
+.sub-menu {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin-top: 3px;
+}
+
+.sub-menu .left-buttons {
+    justify-content: flex-start;
+    display: flex;
+    flex-direction: row;
+}
+
+.sub-menu .left-buttons button ~ button {
+    margin-left: 0.3rem;
+}
+
+.sub-menu .right-buttons {
+    justify-content: flex-end;
+}
+
+.sub-menu button {
+    padding: 0.2rem;
+    border: 2px solid #838181;
+    background-color: dimgray;
+    border-radius: 0.2rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sub-menu button:active {
+    background-color: #838181;
+}
+
+.sub-menu button .icon {
+    color: lightgray;
+    font-size: 1.2rem;
+    line-height: 1.2rem;
 }

@@ -17,7 +17,12 @@ export default class TasksController {
             .where('parent', '=', parent)
             .andWhere('id', '>', 0); 
         
-        return response.json(tasks);
+        if (filters.titleOnly)
+            return response.json(tasks.map((task) => {
+                task.title
+            }))
+        else   
+            return response.json(tasks)
     };
     
     async create(request : Request, response : Response) 
@@ -28,20 +33,28 @@ export default class TasksController {
             done,
             parent
         } = request.body;
-    
+
         if (parent == null)
             parent = 0;
     
         try 
         {
-            await db('tasks').insert({
+            var newTaskID = await db('tasks').insert({
                 title,
                 description,
                 done,
                 parent
-            });
+            }, ['id']);
         
-            return response.status(201).send();
+            var newTask = {
+                "id": newTaskID[0],
+                "title": title,
+                "description": description,
+                "done": done,
+                "parent": parent
+            }
+
+            return response.status(201).json(newTask);
         }
         catch (err) 
         {
@@ -50,5 +63,13 @@ export default class TasksController {
                 error: 'Database error!'
             })
         }
+    };
+
+    async delete(request : Request, response : Response)
+    {
+        var {taskID} = request.body;
+        await db('tasks').where('id', taskID).del();
+        
+        return response.send(200);
     };
 }

@@ -6,5 +6,6 @@ const tasksController = new TasksController();
 
 routes.get('/tasks', tasksController.index);
 routes.post('/tasks', tasksController.create);
+routes.delete('/tasks', tasksController.delete);
 
 export default routes;

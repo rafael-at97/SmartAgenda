@@ -3,11 +3,11 @@ import {TaskObj} from './Task';
 import './Task.css';
 
 interface NewTaskProps {
-    onSubmit(task: TaskObj): void
+    onSubmit(task: TaskObj): void,
+    parentId: number
 }
 
 const NewTask: React.FC<NewTaskProps> = (props) => {
-
     const [title, setTitle] = useState<string>("");
     
     function checkAndSubmit(event: React.FormEvent<HTMLFormElement>)
@@ -17,7 +17,9 @@ const NewTask: React.FC<NewTaskProps> = (props) => {
         if(title !== "")
         {
             props.onSubmit({
+                id: -1,
                 title: title,
+                parent: props.parentId,
                 done: false
             });
             setTitle("");
